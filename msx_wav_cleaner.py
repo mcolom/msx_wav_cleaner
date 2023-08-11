@@ -85,26 +85,22 @@ wav = read_wave(filename_input)
 
 # Correct mean
 wav, wav_mean = correct_mean(wav)
-#save_wave(wav, filename_output)
 
-#save_wave(np.clip(wav*8, a_min=-1, a_max=+1), "output_sat.wav")
+# Saturate the signal at this moment.
+# This is useful with tapes which contain wrongly too-long pulses, such as
+# Sorcery at sample 4809431 (1:49.0570).
+wav = np.clip(wav*8, a_min=-1, a_max=+1)
 
 # Compute local mean
 win = np.array(19 * [1]) # number of samples which cover a HIGH (or low) short pulse
 wav_mean_abs = ssignal.convolve(np.abs(wav), win, mode='same') / sum(win)
-#save_wave(wav_mean_abs, "wav_mean_abs.wav")
 
 # Don't consider close-to-zero mean samples, since they'll
 # blow up the mean correction which follows
 low_energy_mean_indices = np.where(wav_mean_abs < 0.1)
 wav_mean_abs[low_energy_mean_indices] = 1.0
 
-# Connect mean and saturate
-wav = np.multiply(wav, 1/wav_mean_abs)
-wav, _ = correct_mean(9*wav)
-wav = np.clip(wav, a_min=-1, a_max=+1)
-
-# Finally, cancel noise.
+# Finally, remove noise in silences.
 # Do do this, set to zero the samples in "wav" indexed by low_energy_mean_indices
 # Note that the give the size of the mean kernel, the mean won't go to
 # zero during the normal bit transitions of the wav
