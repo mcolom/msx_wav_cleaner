@@ -3,7 +3,7 @@
 
 """
 Clean up MSX WAV files dumped from real cassettes.
-This is tool for the TSX preservation group.
+This tool is mainly to help the TSX preservation group.
 Copyright (c) 2023 mcolom
 """
 
