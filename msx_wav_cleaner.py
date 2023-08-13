@@ -22,6 +22,7 @@ Copyright (c) 2023 mcolom
 
 import argparse
 import numpy as np
+from scipy.fftpack import dct, idct
 from scipy import signal as ssignal
 from scipy.io import wavfile
 
@@ -89,6 +90,31 @@ if len(wav.shape) == 2: # stereo
         wav = wav[:, 0] - wav[:, 1]
     else:
         wav = wav[:, 1] - wav[:, 0]
+
+# Apply low and high pass filters
+D = dct(wav, norm='ortho')
+
+# Low peaks are around 1200 Hz
+# High peaks are around 2400 Hz
+
+f1 = 1200
+f2 = 2 * f1
+
+delta = 500
+
+# Low pass
+i = int(2 * len(wav) * (f1 - delta) / 44100)
+D[:i] = 0
+
+# High pass
+i = int(2 * len(wav) * (f2 + delta) / 44100)
+D[i:] = 0
+
+R = idct(D, norm='ortho')
+#save_wave(R, "R.wav")
+
+wav = R.copy()
+
 
 # Correct mean
 wav, wav_mean = correct_mean(wav)
