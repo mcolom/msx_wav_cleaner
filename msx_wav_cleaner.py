@@ -83,8 +83,16 @@ filename_output = args.output
 # Read input signal
 wav = read_wave(filename_input)
 
+# If it's stereo, subtract the noise/DC level from the signal
+if len(wav.shape) == 2: # stereo
+    if np.abs(wav[:, 0]).sum() > np.abs(wav[:, 1]).sum():
+        wav = wav[:, 0] - wav[:, 1]
+    else:
+        wav = wav[:, 1] - wav[:, 0]
+
 # Correct mean
 wav, wav_mean = correct_mean(wav)
+#save_wave(wav, "mean_corrected.wav")
 
 # Saturate the signal at this moment.
 # This is useful with tapes which contain wrongly too-long pulses, such as
