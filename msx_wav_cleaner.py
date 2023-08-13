@@ -100,7 +100,7 @@ D = dct(wav, norm='ortho')
 f1 = 1200
 f2 = 2 * f1
 
-delta = 500
+delta = 1100 # OK Sorcery and Rampart
 
 # Low pass
 i = int(2 * len(wav) * (f1 - delta) / 44100)
@@ -115,7 +115,6 @@ R = idct(D, norm='ortho')
 
 wav = R.copy()
 
-
 # Correct mean
 wav, wav_mean = correct_mean(wav)
 #save_wave(wav, "mean_corrected.wav")
@@ -128,10 +127,11 @@ wav = np.clip(wav*8, a_min=-1, a_max=+1)
 # Compute local mean
 win = np.array(19 * [1]) # number of samples which cover a HIGH (or low) short pulse
 wav_mean_abs = ssignal.convolve(np.abs(wav), win, mode='same') / sum(win)
+#save_wave(wav_mean_abs, "wav_mean_abs.wav")
 
 # Don't consider close-to-zero mean samples, since they'll
 # blow up the mean correction which follows
-low_energy_mean_indices = np.where(wav_mean_abs < 0.1)
+low_energy_mean_indices = np.where(wav_mean_abs < 0.1) # 0.3 chosen with Rampart, 0.1 for Sorcery. ToDo: set this as a parameter
 wav_mean_abs[low_energy_mean_indices] = 1.0
 
 # Finally, remove noise in silences.
