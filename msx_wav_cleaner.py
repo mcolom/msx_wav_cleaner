@@ -84,12 +84,21 @@ filename_output = args.output
 # Read input signal
 wav = read_wave(filename_input)
 
-# If it's stereo, subtract the noise/DC level from the signal
+# If it's stereo, subtract the noise/DC level from the signal,
+# Check also if indeed one of the channels has significantly less energy than the other.
 if len(wav.shape) == 2: # stereo
     if np.abs(wav[:, 0]).sum() > np.abs(wav[:, 1]).sum():
-        wav = wav[:, 0] - wav[:, 1]
+        r = np.sum(np.abs(wav[:, 0])) / np.sum(np.abs(wav[:, 1]))
+        if r >= 3:
+            wav = wav[:, 0] - wav[:, 1]
+        else:
+            wav = wav[:, 0]
     else:
-        wav = wav[:, 1] - wav[:, 0]
+        r = np.sum(np.abs(wav[:, 1])) / np.sum(np.abs(wav[:, 0]))
+        if r >= 3:
+            wav = wav[:, 1] - wav[:, 0]
+        else:
+            wav = wav[:, 1]
 
 # Apply low and high pass filters
 D = dct(wav, norm='ortho')
