@@ -78,7 +78,7 @@ wav = idct(D, norm='ortho')
 
 
 # test
-wav = wav[44100*40:44100*50]
+wav = wav[44100*40:44100*45]
 
 
 R = np.zeros(len(wav) - 2*half_width)
@@ -133,6 +133,8 @@ plt.show()
 
 # Soften with the mean
 win = np.array(201 * [1])
+R[R is None] = 2400
+R[np.isnan(R)] = 2400
 Rf = ssignal.convolve(R, win, mode='same') / sum(win)
 
 plt.figure()
