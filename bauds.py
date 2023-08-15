@@ -78,7 +78,7 @@ wav = idct(D, norm='ortho')
 
 
 # test
-wav = wav[44100*40:44100*45]
+wav = wav[44100*40:44100*60]
 
 
 R = np.zeros(len(wav) - 2*half_width)
@@ -132,13 +132,15 @@ plt.plot(R)
 plt.show()
 
 # Soften with the mean
-win = np.array(201 * [1])
+win = np.array(22050 * [1]) # average over 1/2 s
 R[R is None] = 2400
 R[np.isnan(R)] = 2400
 Rf = ssignal.convolve(R, win, mode='same') / sum(win)
 
 plt.figure()
+plt.ylim((2380, 2420))
 plt.plot(Rf[half_width:len(Rf)-half_width])
+plt.grid()
 plt.show()
 
 
