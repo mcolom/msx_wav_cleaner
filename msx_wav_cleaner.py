@@ -25,33 +25,8 @@ import numpy as np
 from scipy.fftpack import dct, idct
 from scipy import signal as ssignal
 from scipy.io import wavfile
+from lib import read_wave, save_wave
 
-def read_wave(filename):
-    '''
-    Read a WAV file
-    '''
-    samplerate, wavdata = wavfile.read(filename)
-
-    assert samplerate == 44100
-    if wavdata.dtype == np.uint8:
-        wavdata = (wavdata.astype(int) - 128) / 128
-    elif wavdata.dtype == np.uint16:
-        wavdata = (wavdata.astype(int) - 32768) / 32768
-    elif wavdata.dtype == np.int8:
-        wavdata = wavdata.astype(int) / 128
-    elif wavdata.dtype == np.int16:
-        wavdata = wavdata.astype(int) / 32768
-    else:
-        raise ValueError(wavdata.dtype)
-
-    return wavdata
-
-def save_wave(wavdata, filename):
-    '''
-    Write a WAV file
-    '''
-    wavdata = np.clip(32768*wavdata, a_min=-32768, a_max=32767)
-    wavfile.write(filename, 44100, wavdata.round().astype(np.int16))
 
 def smooth_mean(wav_mean):
     '''
@@ -88,9 +63,9 @@ wav = read_wave(filename_input)
 # Check also if indeed one of the channels has significantly less energy than the other.
 if len(wav.shape) == 2: # stereo
     if np.abs(wav[:, 0]).sum() > np.abs(wav[:, 1]).sum():
-        wav = wav[:, 0] - 0*wav[:, 1]
+        wav = wav[:, 0]
     else:
-        wav = wav[:, 1] - 0*wav[:, 0]
+        wav = wav[:, 1]
 
 # Apply low and high pass filters
 D = dct(wav, norm='ortho')
