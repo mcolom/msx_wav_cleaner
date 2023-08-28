@@ -76,14 +76,15 @@ D = dct(wav, norm='ortho')
 f1 = 1200
 f2 = 2 * f1
 
-delta = 1100 # OK Sorcery and Rampart
+delta_L = 1100 # OK Sorcery and Rampart
+delta_H = 1500
 
 # Low pass
-i = int(2 * len(wav) * (f1 - delta) / 44100)
+i = int(2 * len(wav) * (f1 - delta_L) / 44100)
 D[:i] = 0
 
 # High pass
-i = int(2 * len(wav) * (f2 + delta) / 44100)
+i = int(2 * len(wav) * (f2 + delta_H) / 44100)
 D[i:] = 0
 
 R = idct(D, norm='ortho')
